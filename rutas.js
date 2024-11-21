@@ -1,7 +1,7 @@
 const express = require('express');
 
 const { body, param, validationResult } = require('express-validator');
-const OpenAIHandler = require('./OpenAiHandler');
+const OpenAIHandler = require('./OpenAIHandler');
 var router = express.Router();
 var openai = new OpenAIHandler();
 
