@@ -14,11 +14,11 @@ class OpenAIHandler {
         });
     }
 
-    async requestMessage() {
+    async requestMessage(tema) {
         const response = await this.client.chat.completions.create({
             messages: [{
                 role: 'user',
-                content: 'Envia en formato JSON, un campo con una pregunta sobre matematicas estilo Verdadero o falso, y en otro campo la respuesta correcta con una V para verdadero o una F para falso'
+                content: 'Envia en formato JSON un arreglo de 10 objetos que contengan un campo "pregunta" con una pregunta sobre' + tema + 'estilo Verdadero o falso, y en otro campo llamado "respuesta" la respuesta correcta con una V para verdadero o una F para falso'
             }],
             response_format: {
                 type: 'json_object',
@@ -26,6 +26,7 @@ class OpenAIHandler {
             model: 'gpt-3.5-turbo-0125'
         });
         console.log(response.choices[0].message.content);
+        return (response.choices[0].message.content);
     }
 }
 

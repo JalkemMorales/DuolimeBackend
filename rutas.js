@@ -5,9 +5,10 @@ const OpenAIHandler = require('./OpenAIHandler');
 var router = express.Router();
 var openai = new OpenAIHandler();
 
-router.post('/obtenerPregunta', (req, res) => {
+router.post('/obtenerPregunta', async (req, res) => {
     //TODO: Handler
-    openai.requestMessage();
+    
+    res.status(200).send(await openai.requestMessage(req.body.tema));
 });
 
 module.exports = router;
