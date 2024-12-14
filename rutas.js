@@ -10,7 +10,7 @@ router.post('/obtenerPregunta', async (req, res) => {
 });
 
 router.post('/getProfile', async (req, res) => {
-    res.send(await files.readPerfil()).status(200);
+    res.send(await files.readPerfil(req.body.username, req.body.password)).status(200);
 });
 
 router.post('/registerProfile', async (req, res) => {
