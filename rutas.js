@@ -1,14 +1,24 @@
 const express = require('express');
-
-const { body, param, validationResult } = require('express-validator');
-const OpenAIHandler = require('./OpenAIHandler');
+const FileHandler = require('./FileHandler');
+const OpenAIHandler = require('./OpenAiHandler');
 var router = express.Router();
 var openai = new OpenAIHandler();
+var files = new FileHandler();
 
 router.post('/obtenerPregunta', async (req, res) => {
-    //TODO: Handler
-    
     res.status(200).send(await openai.requestMessage(req.body.tema));
+});
+
+router.post('/getProfile', async (req, res) => {
+    res.send(await files.readPerfil()).status(200);
+});
+
+router.post('/registerProfile', async (req, res) => {
+    res.send(await files.writePerfil(req.body.name, req.body.username, req.body.ranknum)).status(200);
+});
+
+router.post('/getCategories', async (req, res) => {
+    res.send(await files.readCategories()).status(200);
 });
 
 module.exports = router;
