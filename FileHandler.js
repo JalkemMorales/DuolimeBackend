@@ -117,7 +117,7 @@ class FileHandler {
             const users = result.users.user;
             const user = users.find(u => u.username[0] === username && u.password[0] === password);
             if (user) {
-                return user.$.id;
+                return user;
             } else {
                 return null;
             }
