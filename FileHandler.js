@@ -52,7 +52,7 @@ class FileHandler {
           }
     }
 
-    async writePerfil(name, username, ranknum){
+    async writePerfil(username, password){
         this.file = 'perfil';
         this.encryptedPath = this.file + '.enc';
         this.filePath = this.file + '.xml';
@@ -86,9 +86,8 @@ class FileHandler {
       
             const newUser = {
               $: { id: newId.toString() },
-              name: [name],
               username: [username],
-              ranknum: [ranknum.toString()],
+              password: [password],
             };
       
             usersData.users.user.push(newUser);

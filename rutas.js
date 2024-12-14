@@ -14,7 +14,7 @@ router.post('/getProfile', async (req, res) => {
 });
 
 router.post('/registerProfile', async (req, res) => {
-    res.send(await files.writePerfil(req.body.name, req.body.username, req.body.ranknum)).status(200);
+    res.send(await files.writePerfil(req.body.username, req.body.password)).status(200);
 });
 
 router.post('/getCategories', async (req, res) => {
