@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<scores>
+  <user id="1">
+    <category>
+      <name>Banderas</name>
+      <score>509</score>
+    </category>
+    <category>
+      <name>Anime</name>
+      <score>510</score>
+    </category>
+  </user>
+  <user id="2">
+    <category>
+      <name>Anime</name>
+      <score>255</score>
+    </category>
+  </user>
+</scores>

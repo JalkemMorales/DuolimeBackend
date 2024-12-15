@@ -26,7 +26,7 @@ class FileHandler {
 
             // Guardar el IV y el contenido encriptado en el archivo
             await fs.writeFile(this.encryptedPath, iv.toString('hex') + ':' + encrypted);
-            await fs.unlink(this.filesPath);
+            //await fs.unlink(this.filesPath);
         } catch (err) {
             console.error('Error al encriptar el archivo:', err);
         }
@@ -109,6 +109,8 @@ class FileHandler {
 
     async readPerfil(username, password) {
         this.file = 'perfil';
+        this.encryptedPath = this.file + '.enc';
+        this.filePath = this.file + '.xml';
         try {
             await this.decryptFile();
             const data = await fs.readFile(this.filePath, 'utf-8')
@@ -129,6 +131,8 @@ class FileHandler {
 
     async readCategories() {
         this.file = 'categoria';
+        this.encryptedPath = this.file + '.enc';
+        this.filePath = this.file + '.xml';
         try {
             await this.decryptFile();
             const data = await fs.readFile(this.filePath, 'utf-8')
@@ -140,6 +144,184 @@ class FileHandler {
             throw err;
         }
     }
+
+    async readPuntaje(id, categoria) {
+        this.file = 'puntaje';
+        this.encryptedPath = this.file + '.enc';
+        this.filePath = this.file + '.xml';
+        try {
+            await this.decryptFile();
+            const data = await fs.readFile(this.filePath, 'utf-8')
+            const result = await xml2js.parseStringPromise(data);
+            await this.encryptFile();
+            const users = result.scores.user;
+            const user = users.find(u => u.$.id === id);
+            const puntaje = user.category.find(u => u.name[0] === categoria);
+            if (puntaje) {
+                return puntaje.score[0];
+            } else {
+                return null;
+            }
+        } catch (err) {
+            console.error('Error:', err);
+            throw err;
+        }
+    }
+
+    async readRanking() {
+        this.file = 'ranking';
+        this.encryptedPath = this.file + '.enc';
+        this.filePath = this.file + '.xml';
+        try {
+            await this.decryptFile();
+            const data = await fs.readFile(this.filePath, 'utf-8')
+            const result = await xml2js.parseStringPromise(data);
+            await this.encryptFile();
+            console.log(JSON.stringify(result));
+            console.log(result.ranking.user);
+            return result.ranking.user;
+        } catch (err) {
+            console.error('Error:', err);
+            throw err;
+        }
+    }
+
+    async writePuntaje(id, category, newscore) {
+        this.file = 'puntaje';
+        this.encryptedPath = this.file + '.enc';
+        this.filePath = this.file + '.xml';
+
+        try {
+            // Si existe el archivo encriptado, desencriptarlo primero
+            try {
+                await fs.access(this.encryptedPath);
+                console.log('Archivo encriptado encontrado. Desencriptando...');
+                await this.decryptFile();
+            } catch {
+                console.log('No se encontró archivo encriptado. Se creará un nuevo perfil.');
+            }
+
+            let usersData;
+
+            // Leer el archivo XML si existe
+            try {
+                const xmlData = await fs.readFile(this.filePath, 'utf-8');
+                usersData = await xml2js.parseStringPromise(xmlData);
+            } catch {
+                // Si no existe el archivo XML, crear una estructura inicial
+                usersData = { scores: { user: [] } };
+            }
+
+            // Buscar el usuario por ID
+            let user = usersData.scores.user.find(u => u.$.id === id);
+
+            if (!user) {
+                console.log('entre aca');
+                // Si el usuario no existe, crear uno nuevo con la categoría y un score inicial de 0 + newscore
+                user = {
+                    $: { id: id },
+                    category: [
+                        { name: [category], score: [parseInt(newscore)] }
+                    ]
+                };
+                usersData.scores.user.push(user);
+            } else {
+                // Buscar la categoría dentro del usuario
+                let categoryEntry = user.category.find(c => c.name[0] === category);
+
+                if (!categoryEntry) {
+                    // Si la categoría no existe, añadirla con un score inicial de 0 + newscore
+                    categoryEntry = { name: [category], score: [parseInt(newscore)] };
+                    user.category.push(categoryEntry);
+                } else {
+                    // Si la categoría ya existe, sumar el nuevo puntaje al puntaje actual
+                    let currentScore = parseInt(categoryEntry.score[0], 10);
+                    categoryEntry.score[0] = (parseInt(currentScore) + parseInt(newscore)).toString();
+                }
+            }
+
+            // Calcular la suma total de los puntajes del usuario
+
+            // Convertir el objeto de nuevo a XML
+            const builder = new xml2js.Builder();
+            console.log(JSON.stringify(usersData));
+            const newXml = builder.buildObject(usersData);
+
+            // Guardar el nuevo XML en el archivo
+            await fs.writeFile(this.filePath, newXml);
+            console.log(`Puntaje actualizado para el usuario con ID ${id} en la categoría '${category}'.`);
+
+            // Encriptar el archivo XML después de actualizarlo
+            await this.encryptFile();
+            try {
+                const totalScore = user.category.reduce((sum, c) => sum + parseInt(c.score[0], 10), 0);
+
+                // Llamar a writeRanking para actualizar el maxscore
+                await this.writeRanking(id, totalScore);
+            } catch (err) {
+                console.err("Error al registrar en el ranking");
+            }
+        } catch (err) {
+            console.error('Error al escribir en el perfil:', err);
+        }
+    }
+
+    async writeRanking(id, maxscore) {
+        this.file = 'ranking';
+        this.encryptedPath = this.file + '.enc';
+        this.filePath = this.file + '.xml';
+    
+        try {
+            // Si existe el archivo encriptado, desencriptarlo primero
+            try {
+                await fs.access(this.encryptedPath);
+                console.log('Archivo encriptado encontrado. Desencriptando...');
+                await this.decryptFile();
+            } catch {
+                console.log('No se encontró archivo encriptado. Se creará un nuevo perfil.');
+            }
+    
+            let rankingData;
+    
+            // Leer el archivo XML si existe
+            try {
+                const xmlData = await fs.readFile(this.filePath, 'utf-8');
+                rankingData = await xml2js.parseStringPromise(xmlData);
+            } catch {
+                // Si no existe el archivo XML, crear una estructura inicial
+                rankingData = { ranking: { user: [] } };
+            }
+    
+            // Buscar el usuario por ID
+            let user = rankingData.ranking.user.find(u => u.$.id === id);
+    
+            if (!user) {
+                // Si el usuario no existe, agregarlo con el maxscore recibido
+                user = {
+                    $: { id: id },
+                    maxscore: [maxscore.toString()]
+                };
+                rankingData.ranking.user.push(user);
+            } else {
+                // Actualizar el maxscore con el nuevo puntaje
+                user.maxscore[0] = maxscore.toString();
+            }
+    
+            // Convertir el objeto de nuevo a XML
+            const builder = new xml2js.Builder();
+            const newXml = builder.buildObject(rankingData);
+    
+            // Guardar el nuevo XML en el archivo
+            await fs.writeFile(this.filePath, newXml);
+            console.log(`Ranking actualizado para el usuario con ID ${id} con maxscore ${maxscore}.`);
+    
+            // Encriptar el archivo XML después de actualizarlo
+            await this.encryptFile();
+        } catch (err) {
+            console.error('Error al escribir en el ranking:', err);
+        }
+    }
+
 }
 
 module.exports = FileHandler;

@@ -26,9 +26,46 @@ router.post('/getProfile', async (req, res) => {
     }
 });
 
-// router.post('/registerProfile', async (req, res) => {
-//     res.send(await files.writePerfil(req.body.username, req.body.password)).status(200);
-// });
+router.post('/getRanking', async (req, res) => {
+  try {
+      const puntaje = await files.readRanking();
+      if (puntaje) {
+          res.status(200).send(puntaje);
+      } else {
+          res.status(401).send('Error');
+      }
+  } catch (error) {
+      console.error('Error al verificar el ranking:', error);
+      res.status(500).send({ message: 'Error en el servidor.' });
+  }
+});
+
+router.post('/getPuntaje', async (req, res) => {
+  const { id, category } = req.body;
+  try {
+      const puntaje = await files.readPuntaje(id, category);
+      if (puntaje) {
+          res.status(200).send(puntaje);
+      } else {
+          res.status(401).send('0');
+      }
+  } catch (error) {
+      console.error('Error al verificar las puntuaciones:', error);
+      res.status(500).send({ message: 'Error en el servidor.' });
+  }
+});
+
+router.post('/registerPuntaje', async (req, res) => {
+  const { id, category, newscore } = req.body;
+
+  try {
+      console.log(`Id recibido: ${id}, Categoria recibida: ${category}`);
+      await files.writePuntaje(id, category, newscore);
+      res.status(200).send({ message: 'Puntaje registrado exitosamente' });
+  } catch (error) {
+      res.status(500).send({ message: 'Error al registrar puntaje', error });
+  }
+});
 
 router.post('/registerProfile', async (req, res) => {
     const { username, password } = req.body;
