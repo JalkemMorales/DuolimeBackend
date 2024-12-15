@@ -55,6 +55,21 @@ router.post('/getProgress', async (req, res) => {
     }
   });
 
+  router.post('/updateRacha', async (req, res) => {
+    const { id } = req.body;
+    try {
+        const strike = await files.readRacha(id);
+        if (strike) {
+            res.status(200).send(strike);
+        } else {
+            res.status(401).send('Error');
+        }
+    } catch (error) {
+        console.error('Error al verificar la racha:', error);
+        res.status(500).send({ message: 'Error en el servidor.' });
+    }
+  });
+
 router.post('/getPuntaje', async (req, res) => {
   const { id, category } = req.body;
   try {

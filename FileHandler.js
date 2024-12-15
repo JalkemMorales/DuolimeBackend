@@ -2,6 +2,7 @@ const xml2js = require('xml2js');
 const fs = require('fs').promises;
 const crypto = require('crypto');
 const path = require('path');
+const moment = require('moment');
 
 class FileHandler {
 
@@ -168,6 +169,115 @@ class FileHandler {
         }
     }
 
+    async readRacha(id) {
+        this.file = 'racha';
+        this.encryptedPath = this.file + '.enc';
+        this.filePath = this.file + '.xml';
+        try {
+            await this.decryptFile();
+            const data = await fs.readFile(this.filePath, 'utf-8')
+            const result = await xml2js.parseStringPromise(data);
+            await this.encryptFile();
+            console.log(result.streak.user);
+            let users = result.streak.user;
+            let racha = users.find(u => u.$.id === id);
+            if (racha) {
+                await this.writeRacha(id);
+                await this.decryptFile();
+                const data = await fs.readFile(this.filePath, 'utf-8')
+                const result = await xml2js.parseStringPromise(data);
+                await this.encryptFile();
+                users = result.streak.user;
+                racha = users.find(u => u.$.id === id);
+                return racha.numstreak[0];
+            } else {
+                await this.writeRacha(id);
+                return '1';
+            }
+        } catch (err) {
+            console.error('Error:', err);
+            throw err;
+        }
+    }
+
+    async writeRacha(id) {
+        this.file = 'racha';
+        this.encryptedPath = this.file + '.enc';
+        this.filePath = this.file + '.xml';
+
+        try {
+            // Si existe el archivo encriptado, desencriptarlo primero
+            try {
+                await fs.access(this.encryptedPath);
+                console.log('Archivo encriptado encontrado. Desencriptando...');
+                await this.decryptFile();
+            } catch {
+                console.log('No se encontró archivo encriptado. Se creará un nuevo perfil.');
+            }
+
+            let usersData;
+
+            // Leer el archivo XML si existe
+            try {
+                const xmlData = await fs.readFile(this.filePath, 'utf-8');
+                usersData = await xml2js.parseStringPromise(xmlData);
+            } catch {
+                // Si no existe el archivo XML, crear una estructura inicial
+                usersData = { streak: { user: [] } };
+            }
+
+            // Fecha actual
+            const today = moment().format('DD/MM/YYYY');
+            const yesterday = moment().subtract(1, 'days').format('DD/MM/YYYY');
+
+            // Buscar el usuario por ID
+            let user = usersData.streak.user.find(u => u.$.id === id);
+
+            if (!user) {
+                // Si el usuario no existe, añadirlo con una racha de 1 y el día actual
+                user = {
+                    $: { id: id },
+                    lastday: [today],
+                    numstreak: ['1']
+                };
+                usersData.streak.user.push(user);
+            } else {
+                // Obtener la última fecha registrada y la racha actual
+                let lastday = user.lastday[0];
+                let currentStreak = parseInt(user.numstreak[0], 10);
+
+                if (lastday === today) {
+                    // Si el día registrado es hoy, no cambia la racha
+                    console.log(`La racha para el usuario ${id} ya fue actualizada hoy.`);
+                } else if (lastday === yesterday) {
+                    // Si el día registrado es el día anterior, aumentar la racha
+                    user.numstreak[0] = (currentStreak + 1).toString();
+                    console.log(`Racha incrementada para el usuario ${id}. Nueva racha: ${user.numstreak[0]}`);
+                } else {
+                    // Si no es el día anterior, reiniciar la racha a 1
+                    user.numstreak[0] = '1';
+                    console.log(`Racha reiniciada para el usuario ${id}.`);
+                }
+
+                // Actualizar la fecha registrada al día actual
+                user.lastday[0] = today;
+            }
+
+            // Convertir el objeto de nuevo a XML
+            const builder = new xml2js.Builder();
+            const newXml = builder.buildObject(usersData);
+
+            // Guardar el nuevo XML en el archivo
+            await fs.writeFile(this.filePath, newXml);
+            console.log(`Racha actualizada para el usuario con ID ${id}.`);
+
+            // Encriptar el archivo XML después de actualizarlo
+            await this.encryptFile();
+        } catch (err) {
+            console.error('Error al escribir la racha:', err);
+        }
+    }
+
     async readProgreso(id, categoria) {
         this.file = 'progreso';
         this.encryptedPath = this.file + '.enc';
@@ -196,7 +306,7 @@ class FileHandler {
         this.file = 'progreso';
         this.encryptedPath = this.file + '.enc';
         this.filePath = this.file + '.xml';
-    
+
         try {
             // Si existe el archivo encriptado, desencriptarlo primero
             try {
@@ -206,9 +316,9 @@ class FileHandler {
             } catch {
                 console.log('No se encontró archivo encriptado. Se creará un nuevo perfil.');
             }
-    
+
             let usersData;
-    
+
             // Comprobar si el archivo XML existe y leer su contenido
             try {
                 const xmlData = await fs.readFile(this.filePath, 'utf-8');
@@ -217,10 +327,10 @@ class FileHandler {
                 // Si no existe el archivo XML, crear una estructura inicial
                 usersData = { progress: { user: [] } };
             }
-    
+
             // Buscar el usuario por ID
             let user = usersData.progress.user.find(u => u.$.id === id);
-    
+
             if (!user) {
                 // Si el usuario no existe, crear uno nuevo con la categoría y nivel inicial
                 user = {
@@ -233,7 +343,7 @@ class FileHandler {
             } else {
                 // Buscar la categoría dentro del usuario
                 let categoryEntry = user.category.find(c => c.name[0] === category);
-    
+
                 if (!categoryEntry) {
                     // Si la categoría no existe, añadirla con el nuevo nivel
                     categoryEntry = { name: [category], level: [newlevel.toString()] };
@@ -243,15 +353,15 @@ class FileHandler {
                     categoryEntry.level[0] = newlevel.toString();
                 }
             }
-    
+
             // Convertir el objeto de nuevo a XML
             const builder = new xml2js.Builder();
             const newXml = builder.buildObject(usersData);
-    
+
             // Guardar el nuevo XML en el archivo
             await fs.writeFile(this.filePath, newXml);
             console.log(`Progreso actualizado para el usuario con ID ${id} en la categoría '${category}'.`);
-    
+
             // Encriptar el archivo XML después de actualizarlo
             await this.encryptFile();
         } catch (err) {
@@ -361,7 +471,7 @@ class FileHandler {
         this.file = 'ranking';
         this.encryptedPath = this.file + '.enc';
         this.filePath = this.file + '.xml';
-    
+
         try {
             // Si existe el archivo encriptado, desencriptarlo primero
             try {
@@ -371,9 +481,9 @@ class FileHandler {
             } catch {
                 console.log('No se encontró archivo encriptado. Se creará un nuevo perfil.');
             }
-    
+
             let rankingData;
-    
+
             // Leer el archivo XML si existe
             try {
                 const xmlData = await fs.readFile(this.filePath, 'utf-8');
@@ -382,10 +492,10 @@ class FileHandler {
                 // Si no existe el archivo XML, crear una estructura inicial
                 rankingData = { ranking: { user: [] } };
             }
-    
+
             // Buscar el usuario por ID
             let user = rankingData.ranking.user.find(u => u.$.id === id);
-    
+
             if (!user) {
                 // Si el usuario no existe, agregarlo con el maxscore recibido
                 user = {
@@ -397,15 +507,15 @@ class FileHandler {
                 // Actualizar el maxscore con el nuevo puntaje
                 user.maxscore[0] = maxscore.toString();
             }
-    
+
             // Convertir el objeto de nuevo a XML
             const builder = new xml2js.Builder();
             const newXml = builder.buildObject(rankingData);
-    
+
             // Guardar el nuevo XML en el archivo
             await fs.writeFile(this.filePath, newXml);
             console.log(`Ranking actualizado para el usuario con ID ${id} con maxscore ${maxscore}.`);
-    
+
             // Encriptar el archivo XML después de actualizarlo
             await this.encryptFile();
         } catch (err) {
