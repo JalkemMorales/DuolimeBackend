@@ -40,6 +40,21 @@ router.post('/getRanking', async (req, res) => {
   }
 });
 
+router.post('/getProgress', async (req, res) => {
+    const { id, category } = req.body;
+    try {
+        const progreso = await files.readProgreso(id, category);
+        if (progreso) {
+            res.status(200).send(progreso);
+        } else {
+            res.status(401).send('Error');
+        }
+    } catch (error) {
+        console.error('Error al verificar el progreso:', error);
+        res.status(500).send({ message: 'Error en el servidor.' });
+    }
+  });
+
 router.post('/getPuntaje', async (req, res) => {
   const { id, category } = req.body;
   try {
@@ -53,6 +68,17 @@ router.post('/getPuntaje', async (req, res) => {
       console.error('Error al verificar las puntuaciones:', error);
       res.status(500).send({ message: 'Error en el servidor.' });
   }
+});
+
+router.post('/registerProgress', async (req, res) => {
+    const { id, category, newlevel } = req.body;
+
+    try {
+        await files.writeProgress(id, category, newlevel);
+        res.status(200).send({ message: 'Progreso registrado exitosamente' });
+    } catch (error) {
+        res.status(500).send({ message: 'Error al registrar el progreso: ', error });
+    }
 });
 
 router.post('/registerPuntaje', async (req, res) => {
@@ -81,7 +107,6 @@ router.post('/registerProfile', async (req, res) => {
         res.status(500).send({ message: 'Error al registrar usuario', error });
     }
 });
-
 
 router.post('/enviarCorreo', async (req, res) => {
     const { email, password } = req.body;

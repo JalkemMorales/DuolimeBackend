@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<progress>
+  <user id="1">
+    <category>
+      <name>Banderas</name>
+      <level>2</level>
+    </category>
+    <category>
+      <name>Anime</name>
+      <level>1</level>
+    </category>
+    <category>
+      <name>Matematicas</name>
+      <level>1</level>
+    </category>
+  </user>
+</progress>
