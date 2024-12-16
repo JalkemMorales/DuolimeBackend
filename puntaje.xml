@@ -9,11 +9,21 @@
       <name>Anime</name>
       <score>510</score>
     </category>
+    <category>
+      <name>Películas</name>
+      <score>7</score>
+    </category>
   </user>
   <user id="2">
     <category>
       <name>Anime</name>
       <score>255</score>
+    </category>
+  </user>
+  <user id="15">
+    <category>
+      <name>Arte</name>
+      <score>7</score>
     </category>
   </user>
 </scores>
