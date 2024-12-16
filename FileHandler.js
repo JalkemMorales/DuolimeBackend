@@ -36,7 +36,7 @@ class FileHandler {
     // Método para desencriptar el archivo XML
     async decryptFile() {
         try {
-            this.filePath = this.file + '.xml';
+            this.filesPath = this.file + '.xml';
             this.encryptedPath = this.file + '.enc';
             const encryptedData = await fs.readFile(this.encryptedPath, 'utf-8');
             const [ivHex, encryptedContent] = encryptedData.split(':');
@@ -46,8 +46,8 @@ class FileHandler {
             let decrypted = decipher.update(encryptedContent, 'hex', 'utf-8');
             decrypted += decipher.final('utf-8');
 
-            await fs.writeFile(this.filePath, decrypted);
-            console.log('Archivo desencriptado y guardado como:', this.filePath);
+            await fs.writeFile(this.filesPath, decrypted);
+            console.log('Archivo desencriptado y guardado como:', this.filesPath);
         } catch (err) {
             console.error('Error al desencriptar el archivo:', err);
         }
@@ -311,10 +311,15 @@ class FileHandler {
             await this.encryptFile();
             const users = result.progress.user;
             const user = users.find(u => u.$.id === id);
-            const progress = user.category.find(u => u.name[0] === categoria);
+            if(user){
+                const progress = user.category.find(u => u.name[0] === categoria);
             if (progress) {
                 return progress.level[0];
             } else {
+                await this.writeProgress(id, categoria, 1);
+                return '1';
+            }
+            }else{
                 await this.writeProgress(id, categoria, 1);
                 return '1';
             }

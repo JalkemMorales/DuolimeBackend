@@ -13,5 +13,49 @@
       <name>Matematicas</name>
       <level>1</level>
     </category>
+    <category>
+      <name>Series</name>
+      <level>6</level>
+    </category>
+    <category>
+      <name>Historia</name>
+      <level>1</level>
+    </category>
+    <category>
+      <name>Películas</name>
+      <level>1</level>
+    </category>
+    <category>
+      <name>Ciencia</name>
+      <level>1</level>
+    </category>
+  </user>
+  <user id="23">
+    <category>
+      <name>Series</name>
+      <level>1</level>
+    </category>
+    <category>
+      <name>Libros</name>
+      <level>2</level>
+    </category>
+  </user>
+  <user id="22">
+    <category>
+      <name>Banderas</name>
+      <level>1</level>
+    </category>
+    <category>
+      <name>Películas</name>
+      <level>1</level>
+    </category>
+    <category>
+      <name>Cultura pop</name>
+      <level>1</level>
+    </category>
+    <category>
+      <name>Series</name>
+      <level>3</level>
+    </category>
   </user>
 </progress>
