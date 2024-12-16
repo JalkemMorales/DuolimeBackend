@@ -85,6 +85,21 @@ router.post('/getPuntaje', async (req, res) => {
   }
 });
 
+router.post('/getUsername', async (req, res) => {
+    const { id } = req.body;
+    try {
+        const username = await files.readUsername(id);
+        if (username) {
+            res.status(200).send(username);
+        } else {
+            res.status(401).send('0');
+        }
+    } catch (error) {
+        console.error('Error al verificar las puntuaciones:', error);
+        res.status(500).send({ message: 'Error en el servidor.' });
+    }
+  });
+
 router.post('/registerProgress', async (req, res) => {
     const { id, category, newlevel } = req.body;
 

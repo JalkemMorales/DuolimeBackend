@@ -130,6 +130,28 @@ class FileHandler {
         }
     }
 
+    async readUsername(id) {
+        this.file = 'perfil';
+        this.encryptedPath = this.file + '.enc';
+        this.filePath = this.file + '.xml';
+        try {
+            await this.decryptFile();
+            const data = await fs.readFile(this.filePath, 'utf-8')
+            const result = await xml2js.parseStringPromise(data);
+            await this.encryptFile();
+            const users = result.users.user;
+            const user = users.find(u => u.$.id[0] === id);
+            if (user) {
+                return user.username[0];
+            } else {
+                return null;
+            }
+        } catch (err) {
+            console.error('Error:', err);
+            throw err;
+        }
+    }
+
     async readCategories() {
         this.file = 'categoria';
         this.encryptedPath = this.file + '.enc';
