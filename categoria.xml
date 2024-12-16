@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<categories>
+  <category>
+    <name>Banderas</name>
+    <description>Pon a prueba tus conocimientos sobre los colores y diseños que representan a las naciones.</description>
+    <image>../assets/img/banderas.png</image>
+    <bgColor>#ff3200</bgColor>
+    <parametro>Banderas</parametro>
+  </category>
+  <category>
+    <name>Series</name>
+    <description>Demuestra cuánto recuerdas de tus series favoritas, desde los personajes hasta las frases icónicas.</description>
+    <image>../assets/img/series.png</image>
+    <bgColor>#ff9700</bgColor>
+    <parametro>Series</parametro>
+  </category>
+  <category>
+    <name>Películas</name>
+    <description>¿Sabes todo sobre las grandes películas? ¡Prepárate para el reto de la pantalla grande!</description>
+    <image>../assets/img/peliculas.png</image>
+    <bgColor>#ffd500</bgColor>
+    <parametro>Películas</parametro>
+  </category>
+  <category>
+    <name>Cultura pop</name>
+    <description>Desde memes hasta celebridades, pon a prueba tu conocimiento sobre lo que está en boca de todos.</description>
+    <image>../assets/img/cultura-pop.png</image>
+    <bgColor>#a2da00</bgColor>
+    <parametro>Cultura pop</parametro>
+  </category>
+  <category>
+    <name>Historia</name>
+    <description>Viaja en el tiempo para responder preguntas sobre los momentos y personajes que cambiaron el mundo.</description>
+    <image>../assets/img/historia.png</image>
+    <bgColor>#1ada00</bgColor>
+    <parametro>Historia</parametro>
+  </category>
+  <category>
+    <name>Arte</name>
+    <description>Reconoce obras famosas, estilos artísticos y los grandes genios detrás de ellas.</description>
+    <image>../assets/img/arte.png</image>
+    <bgColor>#00da70</bgColor>
+    <parametro>Arte</parametro>
+  </category>
+  <category>
+    <name>Geografía</name>
+    <description>Montañas, ríos, capitales y países. ¿Qué tanto conoces sobre los lugares que forman nuestro mundo?</description>
+    <image>../assets/img/geografia.png</image>
+    <bgColor>#00dac6</bgColor>
+    <parametro>Geografía</parametro>
+  </category>
+  <category>
+    <name>Anime</name>
+    <description>Desde los clásicos hasta los más nuevos, demuestra que eres un verdadero fan del anime.</description>
+    <image>../assets/img/anime.png</image>
+    <bgColor>#0081da</bgColor>
+    <parametro>Anime</parametro>
+  </category>
+  <category>
+    <name>Ciencia</name>
+    <description> Explora preguntas sobre biología, física, química y más para mostrar cuánto sabes del mundo natural.</description>
+    <image>../assets/img/ciencia.png</image>
+    <bgColor>#ac64e1</bgColor>
+    <parametro>Ciencia</parametro>
+  </category>
+  <category>
+    <name>Libros</name>
+    <description>Responde preguntas sobre grandes obras literarias, autores y personajes inolvidables.</description>
+    <image>../assets/img/libros.png</image>
+    <bgColor>#b200da</bgColor>
+    <parametro>Libros</parametro>
+  </category>
+  <category>
+    <name>Videojuegos</name>
+    <description>Desde consolas retro hasta los éxitos más recientes, pon a prueba tus conocimientos en el mundo del gaming.</description>
+    <image>../assets/img/videojuegos.png</image>
+    <bgColor>#f000d3</bgColor>
+    <parametro>Videojuegos</parametro>
+  </category>
+  <category>
+    <name>Música</name>
+    <description>Identifica canciones, artistas y géneros de todas las épocas. ¡Que comience el espectáculo musical!</description>
+    <image>../assets/img/musica.png</image>
+    <bgColor>#f0007f</bgColor>
+    <parametro>Música</parametro>
+  </category>
+</categories>

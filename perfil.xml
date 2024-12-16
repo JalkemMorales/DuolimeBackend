@@ -48,4 +48,16 @@
     <username>Naomi</username>
     <password>ikfi1luc</password>
   </user>
+  <user id="13">
+    <username>pedro</username>
+    <password>delgado</password>
+  </user>
+  <user id="14">
+    <username>pedro</username>
+    <password>delgado</password>
+  </user>
+  <user id="15">
+    <username>Ricardo</username>
+    <password>9erj532c</password>
+  </user>
 </users>
