@@ -1,6 +1,6 @@
 const express = require('express');
 const FileHandler = require('./FileHandler');
-const OpenAIHandler = require('./OpenAiHandler');
+const OpenAIHandler = require('./OpenAIHandler');
 var router = express.Router();
 var openai = new OpenAIHandler();
 var files = new FileHandler();

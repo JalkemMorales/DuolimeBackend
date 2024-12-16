@@ -9,13 +9,14 @@ class FileHandler {
     constructor() {
         this.algorithm = 'aes-256-cbc';
         this.secretKey = crypto.createHash('sha256').update('mi-secreta-clave').digest();
+        this.nfs = '/mnt/nfs_clientshare/';
     }
 
     // Método para encriptar el archivo XML
     async encryptFile() {
         try {
-            this.filesPath = this.file + '.xml';
-            this.encryptedPath = this.file + '.enc';
+            this.filesPath = this.nfs + this.file + '.xml';
+            this.encryptedPath = this.nfs + this.file + '.enc';
             const data = await fs.readFile(this.filesPath, 'utf-8');
 
             // Generar un IV único para esta operación de cifrado
@@ -36,8 +37,8 @@ class FileHandler {
     // Método para desencriptar el archivo XML
     async decryptFile() {
         try {
-            this.filesPath = this.file + '.xml';
-            this.encryptedPath = this.file + '.enc';
+            this.filesPath = this.nfs + this.file + '.xml';
+            this.encryptedPath = this.nfs + this.file + '.enc';
             const encryptedData = await fs.readFile(this.encryptedPath, 'utf-8');
             const [ivHex, encryptedContent] = encryptedData.split(':');
             const iv = Buffer.from(ivHex, 'hex');
@@ -55,8 +56,8 @@ class FileHandler {
 
     async writePerfil(username, password) {
         this.file = 'perfil';
-        this.encryptedPath = this.file + '.enc';
-        this.filePath = this.file + '.xml';
+        this.encryptedPath = this.nfs + this.file + '.enc';
+        this.filePath = this.nfs + this.file + '.xml';
         try {
             // Si existe el archivo encriptado, desencriptarlo primero
             try {
@@ -110,8 +111,8 @@ class FileHandler {
 
     async readPerfil(username, password) {
         this.file = 'perfil';
-        this.encryptedPath = this.file + '.enc';
-        this.filePath = this.file + '.xml';
+        this.encryptedPath = this.nfs + this.file + '.enc';
+        this.filePath = this.nfs + this.file + '.xml';
         try {
             await this.decryptFile();
             const data = await fs.readFile(this.filePath, 'utf-8')
@@ -132,8 +133,8 @@ class FileHandler {
 
     async readUsername(id) {
         this.file = 'perfil';
-        this.encryptedPath = this.file + '.enc';
-        this.filePath = this.file + '.xml';
+        this.encryptedPath = this.nfs + this.file + '.enc';
+        this.filePath = this.nfs + this.file + '.xml';
         try {
             await this.decryptFile();
             const data = await fs.readFile(this.filePath, 'utf-8')
@@ -154,8 +155,8 @@ class FileHandler {
 
     async readCategories() {
         this.file = 'categoria';
-        this.encryptedPath = this.file + '.enc';
-        this.filePath = this.file + '.xml';
+        this.encryptedPath = this.nfs + this.file + '.enc';
+        this.filePath = this.nfs + this.file + '.xml';
         try {
             await this.decryptFile();
             const data = await fs.readFile(this.filePath, 'utf-8')
@@ -170,8 +171,8 @@ class FileHandler {
 
     async readPuntaje(id, categoria) {
         this.file = 'puntaje';
-        this.encryptedPath = this.file + '.enc';
-        this.filePath = this.file + '.xml';
+        this.encryptedPath = this.nfs + this.file + '.enc';
+        this.filePath = this.nfs + this.file + '.xml';
         try {
             await this.decryptFile();
             const data = await fs.readFile(this.filePath, 'utf-8')
@@ -193,8 +194,8 @@ class FileHandler {
 
     async readRacha(id) {
         this.file = 'racha';
-        this.encryptedPath = this.file + '.enc';
-        this.filePath = this.file + '.xml';
+        this.encryptedPath = this.nfs + this.file + '.enc';
+        this.filePath = this.nfs + this.file + '.xml';
         try {
             await this.decryptFile();
             const data = await fs.readFile(this.filePath, 'utf-8')
@@ -224,8 +225,8 @@ class FileHandler {
 
     async writeRacha(id) {
         this.file = 'racha';
-        this.encryptedPath = this.file + '.enc';
-        this.filePath = this.file + '.xml';
+        this.encryptedPath = this.nfs + this.file + '.enc';
+        this.filePath = this.nfs + this.file + '.xml';
 
         try {
             // Si existe el archivo encriptado, desencriptarlo primero
@@ -302,8 +303,8 @@ class FileHandler {
 
     async readProgreso(id, categoria) {
         this.file = 'progreso';
-        this.encryptedPath = this.file + '.enc';
-        this.filePath = this.file + '.xml';
+        this.encryptedPath = this.nfs + this.file + '.enc';
+        this.filePath = this.nfs + this.file + '.xml';
         try {
             await this.decryptFile();
             const data = await fs.readFile(this.filePath, 'utf-8')
@@ -331,8 +332,8 @@ class FileHandler {
 
     async writeProgress(id, category, newlevel) {
         this.file = 'progreso';
-        this.encryptedPath = this.file + '.enc';
-        this.filePath = this.file + '.xml';
+        this.encryptedPath = this.nfs + this.file + '.enc';
+        this.filePath = this.nfs + this.file + '.xml';
 
         try {
             // Si existe el archivo encriptado, desencriptarlo primero
@@ -398,8 +399,8 @@ class FileHandler {
 
     async readRanking() {
         this.file = 'ranking';
-        this.encryptedPath = this.file + '.enc';
-        this.filePath = this.file + '.xml';
+        this.encryptedPath = this.nfs + this.file + '.enc';
+        this.filePath = this.nfs + this.file + '.xml';
         try {
             await this.decryptFile();
             const data = await fs.readFile(this.filePath, 'utf-8')
@@ -416,8 +417,8 @@ class FileHandler {
 
     async writePuntaje(id, category, newscore) {
         this.file = 'puntaje';
-        this.encryptedPath = this.file + '.enc';
-        this.filePath = this.file + '.xml';
+        this.encryptedPath = this.nfs + this.file + '.enc';
+        this.filePath = this.nfs + this.file + '.xml';
 
         try {
             // Si existe el archivo encriptado, desencriptarlo primero
@@ -496,8 +497,8 @@ class FileHandler {
 
     async writeRanking(id, maxscore) {
         this.file = 'ranking';
-        this.encryptedPath = this.file + '.enc';
-        this.filePath = this.file + '.xml';
+        this.encryptedPath = this.nfs + this.file + '.enc';
+        this.filePath = this.nfs + this.file + '.xml';
 
         try {
             // Si existe el archivo encriptado, desencriptarlo primero
