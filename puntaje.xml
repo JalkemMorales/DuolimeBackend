@@ -25,5 +25,9 @@
       <name>Arte</name>
       <score>7</score>
     </category>
+    <category>
+      <name>Anime</name>
+      <score>9</score>
+    </category>
   </user>
 </scores>
