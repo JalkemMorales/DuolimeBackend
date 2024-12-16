@@ -30,4 +30,14 @@
       <score>18</score>
     </category>
   </user>
+  <user id="16">
+    <category>
+      <name>Series</name>
+      <score>10</score>
+    </category>
+    <category>
+      <name>Películas</name>
+      <score>6</score>
+    </category>
+  </user>
 </scores>

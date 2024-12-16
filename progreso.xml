@@ -14,4 +14,18 @@
       <level>1</level>
     </category>
   </user>
+  <user id="16">
+    <category>
+      <name>Películas</name>
+      <level>7</level>
+    </category>
+    <category>
+      <name>Banderas</name>
+      <level>10</level>
+    </category>
+    <category>
+      <name>Cultura pop</name>
+      <level>2</level>
+    </category>
+  </user>
 </progress>
