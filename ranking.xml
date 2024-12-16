@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ranking>
   <user id="1">
-<<<<<<< HEAD
     <maxscore>1084</maxscore>
-=======
-    <maxscore>1049</maxscore>
->>>>>>> 72c54771c6e6abcbf5bd99327efb73f0b5d06a01
   </user>
   <user id="2">
     <maxscore>1209</maxscore>
@@ -19,21 +15,10 @@
   <user id="5">
     <maxscore>745</maxscore>
   </user>
-<<<<<<< HEAD
   <user id="23">
     <maxscore>8</maxscore>
   </user>
   <user id="22">
     <maxscore>17</maxscore>
-=======
-  <user id="15">
-    <maxscore>25</maxscore>
-  </user>
-  <user id="16">
-    <maxscore>16</maxscore>
-  </user>
-  <user id="17">
-    <maxscore>47</maxscore>
->>>>>>> 72c54771c6e6abcbf5bd99327efb73f0b5d06a01
   </user>
 </ranking>

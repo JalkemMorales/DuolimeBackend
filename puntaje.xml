@@ -3,11 +3,7 @@
   <user id="1">
     <category>
       <name>Banderas</name>
-<<<<<<< HEAD
       <score>512</score>
-=======
-      <score>517</score>
->>>>>>> 72c54771c6e6abcbf5bd99327efb73f0b5d06a01
     </category>
     <category>
       <name>Anime</name>
@@ -15,23 +11,11 @@
     </category>
     <category>
       <name>Películas</name>
-<<<<<<< HEAD
       <score>25</score>
     </category>
     <category>
       <name>Series</name>
       <score>37</score>
-=======
-      <score>7</score>
-    </category>
-    <category>
-      <name>Cultura pop</name>
-      <score>5</score>
-    </category>
-    <category>
-      <name>Series</name>
-      <score>10</score>
->>>>>>> 72c54771c6e6abcbf5bd99327efb73f0b5d06a01
     </category>
   </user>
   <user id="2">
@@ -40,7 +24,6 @@
       <score>255</score>
     </category>
   </user>
-<<<<<<< HEAD
   <user id="23">
     <category>
       <name>Libros</name>
@@ -53,40 +36,4 @@
       <score>17</score>
     </category>
   </user>
-=======
-  <user id="15">
-    <category>
-      <name>Arte</name>
-      <score>7</score>
-    </category>
-    <category>
-      <name>Anime</name>
-      <score>18</score>
-    </category>
-  </user>
-  <user id="16">
-    <category>
-      <name>Series</name>
-      <score>10</score>
-    </category>
-    <category>
-      <name>Películas</name>
-      <score>6</score>
-    </category>
-  </user>
-  <user id="17">
-    <category>
-      <name>Banderas</name>
-      <score>24</score>
-    </category>
-    <category>
-      <name>Series</name>
-      <score>15</score>
-    </category>
-    <category>
-      <name>Películas</name>
-      <score>8</score>
-    </category>
-  </user>
->>>>>>> 72c54771c6e6abcbf5bd99327efb73f0b5d06a01
 </scores>
