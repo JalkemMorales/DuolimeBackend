@@ -3,4 +3,16 @@
   <user id="1">
     <maxscore>1019</maxscore>
   </user>
+    <user id="2">
+    <maxscore>1209</maxscore>
+  </user>
+    <user id="3">
+    <maxscore>709</maxscore>
+  </user>
+    <user id="4">
+    <maxscore>375</maxscore>
+  </user>
+    <user id="5">
+    <maxscore>745</maxscore>
+  </user>
 </ranking>
