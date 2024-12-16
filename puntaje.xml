@@ -3,7 +3,7 @@
   <user id="1">
     <category>
       <name>Banderas</name>
-      <score>509</score>
+      <score>517</score>
     </category>
     <category>
       <name>Anime</name>
@@ -12,6 +12,14 @@
     <category>
       <name>Películas</name>
       <score>7</score>
+    </category>
+    <category>
+      <name>Cultura pop</name>
+      <score>5</score>
+    </category>
+    <category>
+      <name>Series</name>
+      <score>10</score>
     </category>
   </user>
   <user id="2">
@@ -38,6 +46,20 @@
     <category>
       <name>Películas</name>
       <score>6</score>
+    </category>
+  </user>
+  <user id="17">
+    <category>
+      <name>Banderas</name>
+      <score>24</score>
+    </category>
+    <category>
+      <name>Series</name>
+      <score>15</score>
+    </category>
+    <category>
+      <name>Películas</name>
+      <score>8</score>
     </category>
   </user>
 </scores>

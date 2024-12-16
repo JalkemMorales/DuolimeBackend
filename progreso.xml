@@ -3,7 +3,7 @@
   <user id="1">
     <category>
       <name>Banderas</name>
-      <level>2</level>
+      <level>4</level>
     </category>
     <category>
       <name>Anime</name>
@@ -11,6 +11,30 @@
     </category>
     <category>
       <name>Matematicas</name>
+      <level>1</level>
+    </category>
+    <category>
+      <name>Series</name>
+      <level>2</level>
+    </category>
+    <category>
+      <name>Películas</name>
+      <level>1</level>
+    </category>
+    <category>
+      <name>Cultura pop</name>
+      <level>2</level>
+    </category>
+    <category>
+      <name>Historia</name>
+      <level>1</level>
+    </category>
+    <category>
+      <name>Geografía</name>
+      <level>1</level>
+    </category>
+    <category>
+      <name>Arte</name>
       <level>1</level>
     </category>
   </user>
@@ -26,6 +50,36 @@
     <category>
       <name>Cultura pop</name>
       <level>2</level>
+    </category>
+  </user>
+  <user id="17">
+    <category>
+      <name>Cultura pop</name>
+      <level>1</level>
+    </category>
+    <category>
+      <name>Series</name>
+      <level>2</level>
+    </category>
+    <category>
+      <name>Banderas</name>
+      <level>3</level>
+    </category>
+    <category>
+      <name>Historia</name>
+      <level>4</level>
+    </category>
+    <category>
+      <name>Anime</name>
+      <level>1</level>
+    </category>
+    <category>
+      <name>Ciencia</name>
+      <level>1</level>
+    </category>
+    <category>
+      <name>Películas</name>
+      <level>1</level>
     </category>
   </user>
 </progress>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ranking>
   <user id="1">
-    <maxscore>1026</maxscore>
+    <maxscore>1049</maxscore>
   </user>
   <user id="2">
     <maxscore>1209</maxscore>
@@ -20,5 +20,8 @@
   </user>
   <user id="16">
     <maxscore>16</maxscore>
+  </user>
+  <user id="17">
+    <maxscore>47</maxscore>
   </user>
 </ranking>
