@@ -3,7 +3,7 @@
   <user id="1">
     <category>
       <name>Banderas</name>
-      <level>2</level>
+      <level>4</level>
     </category>
     <category>
       <name>Anime</name>
@@ -15,6 +15,7 @@
     </category>
     <category>
       <name>Series</name>
+<<<<<<< HEAD
       <level>6</level>
     </category>
     <category>
@@ -45,17 +46,81 @@
       <name>Banderas</name>
       <level>1</level>
     </category>
+=======
+      <level>2</level>
+    </category>
+>>>>>>> 72c54771c6e6abcbf5bd99327efb73f0b5d06a01
     <category>
       <name>Películas</name>
       <level>1</level>
     </category>
     <category>
       <name>Cultura pop</name>
+<<<<<<< HEAD
+=======
+      <level>2</level>
+    </category>
+    <category>
+      <name>Historia</name>
+      <level>1</level>
+    </category>
+    <category>
+      <name>Geografía</name>
+      <level>1</level>
+    </category>
+    <category>
+      <name>Arte</name>
+      <level>1</level>
+    </category>
+  </user>
+  <user id="16">
+    <category>
+      <name>Películas</name>
+      <level>7</level>
+    </category>
+    <category>
+      <name>Banderas</name>
+      <level>10</level>
+    </category>
+    <category>
+      <name>Cultura pop</name>
+      <level>2</level>
+    </category>
+  </user>
+  <user id="17">
+    <category>
+      <name>Cultura pop</name>
+>>>>>>> 72c54771c6e6abcbf5bd99327efb73f0b5d06a01
       <level>1</level>
     </category>
     <category>
       <name>Series</name>
+<<<<<<< HEAD
       <level>3</level>
     </category>
+=======
+      <level>2</level>
+    </category>
+    <category>
+      <name>Banderas</name>
+      <level>3</level>
+    </category>
+    <category>
+      <name>Historia</name>
+      <level>4</level>
+    </category>
+    <category>
+      <name>Anime</name>
+      <level>1</level>
+    </category>
+    <category>
+      <name>Ciencia</name>
+      <level>1</level>
+    </category>
+    <category>
+      <name>Películas</name>
+      <level>1</level>
+    </category>
+>>>>>>> 72c54771c6e6abcbf5bd99327efb73f0b5d06a01
   </user>
 </progress>

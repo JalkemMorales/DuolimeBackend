@@ -61,6 +61,7 @@
     <password>9erj532c</password>
   </user>
   <user id="16">
+<<<<<<< HEAD
     <username>bryan</username>
     <password>0n5NR(N0</password>
   </user>
@@ -91,5 +92,13 @@
   <user id="23">
     <username>jalkem</username>
     <password>6sHxYtrw</password>
+=======
+    <username>Lorena</username>
+    <password>mercado</password>
+  </user>
+  <user id="17">
+    <username>PedroDelgao</username>
+    <password>07x7unz6</password>
+>>>>>>> 72c54771c6e6abcbf5bd99327efb73f0b5d06a01
   </user>
 </users>
