@@ -1,9 +1,14 @@
 const express = require('express');
+
 const FileHandler = require('./FileHandler');
 const OpenAIHandler = require('./OpenAIHandler');
+const MySQLHandler = require('./MySQLHandler');
+
 var router = express.Router();
 var openai = new OpenAIHandler();
 var files = new FileHandler();
+var mysql = new MySQLHandler();
+
 const nodemailer = require('nodemailer');
 
 router.post('/obtenerPregunta', async (req, res) => {
@@ -11,10 +16,12 @@ router.post('/obtenerPregunta', async (req, res) => {
 });
 
 router.post('/getProfile', async (req, res) => {
+    console.log('Recibiendo solicitud de perfil');
+    console.log('Cuerpo de la solicitud:', req.body);
     const { username, password } = req.body;
 
     try {
-        const user = await files.readPerfil(username, password);
+        const user = await mysql.readPerfil(username, password);
         if (user) {
             res.status(200).send(user);
         } else {
@@ -171,7 +178,7 @@ router.post('/enviarCorreo', async (req, res) => {
 
 
 router.post('/getCategories', async (req, res) => {
-    res.send(await files.readCategories()).status(200);
+    res.send(await mysql.readCategories()).status(200);
 });
 
 module.exports = router;
