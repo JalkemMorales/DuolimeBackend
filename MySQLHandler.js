@@ -62,7 +62,7 @@ class MySQLHandler {
       // Consultar el nivel de progreso existente
       const [rows] = await connection.query(
         `SELECT level FROM progreso 
-             WHERE Usuario_id = ? AND Categoria_id = ?`,
+             WHERE Usuario_id = ? AND Categoria_id = ? ORDER BY level DESC`,
         [userId, categoriaId]
       );
 
@@ -161,11 +161,12 @@ class MySQLHandler {
       connection = await this.pool.promise().getConnection();
       const [rows] = await connection.query(
         `SELECT score FROM puntaje 
-             WHERE Usuario_id = ? AND Categoria_id = ?`,
+             WHERE Usuario_id = ? AND Categoria_id = ? ORDER BY score DESC`,
         [userId, categoriaId]
       );
 
       if (rows.length > 0) {
+        console.log('Puntajes: ' + JSON.stringify(rows));
         return rows[0].score.toString();
       } else {
         return null;
@@ -177,6 +178,62 @@ class MySQLHandler {
       if (connection) connection.release();
     }
   }
+
+  async writePuntaje(userId, categoriaId, newscore, level) {
+    let connection;
+    try {
+        connection = await this.pool.promise().getConnection();
+        
+        // Actualizar o insertar el puntaje
+        await connection.query(
+            `INSERT INTO puntaje (Usuario_id, Categoria_id, score, id, update_date, level)
+             VALUES (?, ?, ?, UUID(), current_timestamp(), ?)
+             ON DUPLICATE KEY UPDATE score = score + VALUES(score)`,
+            [userId, categoriaId, newscore, level]
+        );
+        
+        console.log(`Puntaje actualizado para usuario ${userId}, categoría ${categoriaId}: +${newscore} puntos`);
+        
+        // Calcular el puntaje total del usuario
+        const [totalRows] = await connection.query(
+            `SELECT SUM(score) as total FROM puntaje WHERE Usuario_id = ?`,
+            [userId]
+        );
+        
+        const totalScore = totalRows[0].total || 0;
+        
+        // Actualizar el ranking
+        await this.writeRanking(userId, totalScore);
+        
+    } catch (err) {
+        console.error("Error al escribir puntaje:", err);
+        throw err;
+    } finally {
+        if (connection) connection.release();
+    }
+}
+
+async writeRanking(userId, maxscore) {
+    let connection;
+    try {
+        connection = await this.pool.promise().getConnection();
+        
+        // Actualizar o insertar en el ranking
+        await connection.query(
+            `INSERT INTO ranking (Usuario_id, maxscore)
+             VALUES (?, ?)
+             ON DUPLICATE KEY UPDATE maxscore = VALUES(maxscore)`,
+            [userId, maxscore]
+        );
+        
+        console.log(`Ranking actualizado para usuario ${userId}: maxscore ${maxscore}`);
+    } catch (err) {
+        console.error("Error al escribir ranking:", err);
+        throw err;
+    } finally {
+        if (connection) connection.release();
+    }
+}
 }
 
 module.exports = MySQLHandler;

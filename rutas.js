@@ -109,7 +109,7 @@ router.post('/registerProgress', async (req, res) => {
     const { id, category, newlevel } = req.body;
 
     try {
-        await files.writeProgress(id, category, newlevel);
+        await mysql.writeProgress(id, category, newlevel);
         res.status(200).send({ message: 'Progreso registrado exitosamente' });
     } catch (error) {
         res.status(500).send({ message: 'Error al registrar el progreso: ', error });
@@ -117,11 +117,11 @@ router.post('/registerProgress', async (req, res) => {
 });
 
 router.post('/registerPuntaje', async (req, res) => {
-  const { id, category, newscore } = req.body;
+  const { id, category, newscore, level } = req.body;
 
   try {
       console.log(`Id recibido: ${id}, Categoria recibida: ${category}`);
-      await files.writePuntaje(id, category, newscore);
+      await mysql.writePuntaje(id, category, newscore, level);
       res.status(200).send({ message: 'Puntaje registrado exitosamente' });
   } catch (error) {
       res.status(500).send({ message: 'Error al registrar puntaje', error });
