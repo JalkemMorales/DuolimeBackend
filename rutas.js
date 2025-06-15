@@ -16,8 +16,6 @@ router.post('/obtenerPregunta', async (req, res) => {
 });
 
 router.post('/getProfile', async (req, res) => {
-    console.log('Recibiendo solicitud de perfil');
-    console.log('Cuerpo de la solicitud:', req.body);
     const { username, password } = req.body;
 
     try {
@@ -50,9 +48,9 @@ router.post('/getRanking', async (req, res) => {
 router.post('/getProgress', async (req, res) => {
     const { id, category } = req.body;
     try {
-        const progreso = await files.readProgreso(id, category);
+        const progreso = await mysql.readProgreso(id, category);
         if (progreso) {
-            res.status(200).send(progreso);
+            res.status(200).send(progreso.toString());
         } else {
             res.status(401).send('Error');
         }
@@ -65,7 +63,7 @@ router.post('/getProgress', async (req, res) => {
   router.post('/updateRacha', async (req, res) => {
     const { id } = req.body;
     try {
-        const strike = await files.readRacha(id);
+        const strike = await mysql.readRacha(id);
         if (strike) {
             res.status(200).send(strike);
         } else {
@@ -80,7 +78,7 @@ router.post('/getProgress', async (req, res) => {
 router.post('/getPuntaje', async (req, res) => {
   const { id, category } = req.body;
   try {
-      const puntaje = await files.readPuntaje(id, category);
+      const puntaje = await mysql.readPuntaje(id, category);
       if (puntaje) {
           res.status(200).send(puntaje);
       } else {
