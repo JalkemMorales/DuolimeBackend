@@ -67,6 +67,7 @@ class MySQLHandler {
       );
 
       if (rows.length > 0) {
+        console.log('DEVUELTO: ' + rows[0].level);
         return rows[0].level;
       } else {
         await this.writeProgress(userId, categoriaId, 1);
