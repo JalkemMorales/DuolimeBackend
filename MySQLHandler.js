@@ -46,10 +46,112 @@ class MySQLHandler {
     let connection;
     try {
       connection = await this.pool.promise().getConnection();
-      const [rows] = await connection.query(`SELECT * FROM categoria;`);
+      const [rows] = await connection.query(`SELECT id, name FROM categoria;`);
       return rows ? rows : null;
     } catch (err) {
-      console.error("Error al leer perfil:", err);
+      console.error("Error al leer categorias:", err);
+      throw err;
+    } finally {
+      if (connection) connection.release();
+    }
+  }
+
+    async readAllScoresByCategoryId(categoriaId) {
+    let connection;
+    try {
+      connection = await this.pool.promise().getConnection();
+      const [rows] = await connection.query(
+        `SELECT
+            u.username,
+            p.score
+         FROM
+            puntaje p
+         JOIN
+            usuario u ON p.Usuario_id = u.id
+         WHERE
+            p.Categoria_id = ?
+         ORDER BY
+            p.score DESC`,
+        [categoriaId]
+      );
+      return rows || [];
+    } catch (err) {
+      console.error(`Error al leer todos los puntajes para la categoría ${categoriaId}:`, err);
+      throw err;
+    } finally {
+      if (connection) connection.release();
+    }
+  }
+
+    async readGlobalRanking() {
+    let connection;
+    try {
+      connection = await this.pool.promise().getConnection();
+      const [rows] = await connection.query(
+        `SELECT
+            u.username,
+            r.maxscore AS total_score_global
+         FROM
+            ranking r
+         JOIN
+            usuario u ON r.Usuario_id = u.id
+         ORDER BY
+            r.maxscore DESC, u.username ASC`
+      );
+      return rows || [];
+    } catch (err) {
+      console.error("Error al leer el ranking global (desde tabla 'ranking'):", err);
+      throw err;
+    } finally {
+      if (connection) connection.release();
+    }
+  }
+
+  async readStreakRanking() {
+    let connection;
+    try {
+      connection = await this.pool.promise().getConnection();
+      const [rows] = await connection.query(
+        `SELECT
+            u.username,
+            r.numstreak AS streak_count
+         FROM
+            racha r
+         JOIN
+            usuario u ON r.Usuario_id = u.id
+         ORDER BY
+            r.numstreak DESC, u.username ASC`
+      );
+      return rows || [];
+    } catch (err) {
+      console.error("Error al leer el ranking de rachas:", err);
+      throw err;
+    } finally {
+      if (connection) connection.release();
+    }
+  }
+
+  async readPopularCategories() {
+    let connection;
+    try {
+      connection = await this.pool.promise().getConnection();
+      const [rows] = await connection.query(
+        `SELECT
+            c.id AS category_id,
+            c.name AS category_name,
+            COALESCE(SUM(p.score), 0) AS total_score
+         FROM
+            categoria c
+         LEFT JOIN
+            puntaje p ON c.id = p.Categoria_id
+         GROUP BY
+            c.id, c.name
+         ORDER BY
+            total_score DESC, c.name ASC;`
+      );
+      return rows || []; // Retorna un array vacío si no hay resultados
+    } catch (err) {
+      console.error("Error al leer categorías populares:", err);
       throw err;
     } finally {
       if (connection) connection.release();
@@ -99,42 +201,38 @@ class MySQLHandler {
     }
   }
 
-  async readRacha(userId) {
+async updateAndGetRacha(userId) {
     let connection;
     try {
       connection = await this.pool.promise().getConnection();
       await connection.beginTransaction();
-
+      console.log(`[Racha Logic - Simplified] START: Processing racha for userId: ${userId}`);
       const [rows] = await connection.query(
         `SELECT lastday, numstreak FROM racha 
          WHERE Usuario_id = ? FOR UPDATE`,
         [userId]
       );
 
+      console.log(`[Racha Logic - Simplified] DB Query Result for userId ${userId}:`, rows);
       const today = moment().format("YYYY-MM-DD");
-      const yesterday = moment().subtract(1, "days").format("YYYY-MM-DD");
-
       let newStreak = 1;
-
       if (rows.length > 0) {
         const { lastday, numstreak } = rows[0];
+        const dbLastDayFormatted = moment(lastday).format("YYYY-MM-DD"); 
 
-        if (lastday === today) {
+        console.log(`[Racha Logic - Simplified] Existing Streak Found: lastday=${dbLastDayFormatted}, numstreak=${numstreak}`);
+
+        if (dbLastDayFormatted === today) {
           newStreak = numstreak;
-        } else if (lastday === yesterday) {
+          console.log(`[Racha Logic - Simplified] Condition: lastday === today. Streak remains: ${newStreak}`);
+        } else {
           newStreak = numstreak + 1;
           await connection.query(
             `UPDATE racha SET lastday = ?, numstreak = ? 
              WHERE Usuario_id = ?`,
             [today, newStreak, userId]
           );
-        } else {
-          newStreak = 1;
-          await connection.query(
-            `UPDATE racha SET lastday = ?, numstreak = ? 
-             WHERE Usuario_id = ?`,
-            [today, newStreak, userId]
-          );
+          console.log(`[Racha Logic - Simplified] Condition: User active today for first time. Streak incremented to: ${newStreak}`);
         }
       } else {
         await connection.query(
@@ -142,13 +240,15 @@ class MySQLHandler {
            VALUES (?, ?, ?)`,
           [userId, today, newStreak]
         );
+        console.log(`[Racha Logic - Simplified] No existing streak entry. Inserted new streak: ${newStreak}`);
       }
 
       await connection.commit();
+      console.log(`[Racha Logic - Simplified] END: Transaction committed. Returning newStreak: ${newStreak}`);
       return newStreak.toString();
     } catch (err) {
       if (connection) await connection.rollback();
-      console.error("Error en readRacha:", err);
+      console.error("[Racha Logic - Simplified] CRITICAL ERROR in updateAndGetRacha:", err);
       throw err;
     } finally {
       if (connection) connection.release();
