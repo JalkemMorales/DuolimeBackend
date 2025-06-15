@@ -90,6 +90,7 @@ class MySQLHandler {
       const [rows] = await connection.query(
         `SELECT
             u.username,
+            r.Usuario_id,
             r.maxscore AS total_score_global
          FROM
             ranking r
