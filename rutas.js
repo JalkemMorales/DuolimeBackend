@@ -211,4 +211,19 @@ router.post('/getCategories', async (req, res) => {
     res.send(await mysql.readCategories()).status(200);
 });
 
+router.post('/getUserProfile', async (req, res) => {
+    const { id } = req.body;
+    try {
+        const profileData = await mysql.readUserProfile(id);
+        if (profileData) {
+            res.status(200).json(profileData);
+        } else {
+            res.status(404).json({ message: 'Perfil no encontrado' });
+        }
+    } catch (error) {
+        console.error('Error al obtener datos del perfil:', error);
+        res.status(500).json({ message: 'Error en el servidor.' });
+    }
+});
+
 module.exports = router;

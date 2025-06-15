@@ -56,7 +56,7 @@ class MySQLHandler {
     }
   }
 
-    async readAllScoresByCategoryId(categoriaId) {
+  async readAllScoresByCategoryId(categoriaId) {
     let connection;
     try {
       connection = await this.pool.promise().getConnection();
@@ -76,14 +76,17 @@ class MySQLHandler {
       );
       return rows || [];
     } catch (err) {
-      console.error(`Error al leer todos los puntajes para la categoría ${categoriaId}:`, err);
+      console.error(
+        `Error al leer todos los puntajes para la categoría ${categoriaId}:`,
+        err
+      );
       throw err;
     } finally {
       if (connection) connection.release();
     }
   }
 
-    async readGlobalRanking() {
+  async readGlobalRanking() {
     let connection;
     try {
       connection = await this.pool.promise().getConnection();
@@ -101,7 +104,10 @@ class MySQLHandler {
       );
       return rows || [];
     } catch (err) {
-      console.error("Error al leer el ranking global (desde tabla 'ranking'):", err);
+      console.error(
+        "Error al leer el ranking global (desde tabla 'ranking'):",
+        err
+      );
       throw err;
     } finally {
       if (connection) connection.release();
@@ -170,7 +176,7 @@ class MySQLHandler {
       );
 
       if (rows.length > 0) {
-        console.log('DEVUELTO: ' + rows[0].level);
+        console.log("DEVUELTO: " + rows[0].level);
         return rows[0].level;
       } else {
         await this.writeProgress(userId, categoriaId, 1);
@@ -203,30 +209,39 @@ class MySQLHandler {
     }
   }
 
-async updateAndGetRacha(userId) {
+  async updateAndGetRacha(userId) {
     let connection;
     try {
       connection = await this.pool.promise().getConnection();
       await connection.beginTransaction();
-      console.log(`[Racha Logic - Simplified] START: Processing racha for userId: ${userId}`);
+      console.log(
+        `[Racha Logic - Simplified] START: Processing racha for userId: ${userId}`
+      );
       const [rows] = await connection.query(
         `SELECT lastday, numstreak FROM racha 
          WHERE Usuario_id = ? FOR UPDATE`,
         [userId]
       );
 
-      console.log(`[Racha Logic - Simplified] DB Query Result for userId ${userId}:`, rows);
+      console.log(
+        `[Racha Logic - Simplified] DB Query Result for userId ${userId}:`,
+        rows
+      );
       const today = moment().format("YYYY-MM-DD");
       let newStreak = 1;
       if (rows.length > 0) {
         const { lastday, numstreak } = rows[0];
-        const dbLastDayFormatted = moment(lastday).format("YYYY-MM-DD"); 
+        const dbLastDayFormatted = moment(lastday).format("YYYY-MM-DD");
 
-        console.log(`[Racha Logic - Simplified] Existing Streak Found: lastday=${dbLastDayFormatted}, numstreak=${numstreak}`);
+        console.log(
+          `[Racha Logic - Simplified] Existing Streak Found: lastday=${dbLastDayFormatted}, numstreak=${numstreak}`
+        );
 
         if (dbLastDayFormatted === today) {
           newStreak = numstreak;
-          console.log(`[Racha Logic - Simplified] Condition: lastday === today. Streak remains: ${newStreak}`);
+          console.log(
+            `[Racha Logic - Simplified] Condition: lastday === today. Streak remains: ${newStreak}`
+          );
         } else {
           newStreak = numstreak + 1;
           await connection.query(
@@ -234,7 +249,9 @@ async updateAndGetRacha(userId) {
              WHERE Usuario_id = ?`,
             [today, newStreak, userId]
           );
-          console.log(`[Racha Logic - Simplified] Condition: User active today for first time. Streak incremented to: ${newStreak}`);
+          console.log(
+            `[Racha Logic - Simplified] Condition: User active today for first time. Streak incremented to: ${newStreak}`
+          );
         }
       } else {
         await connection.query(
@@ -242,15 +259,22 @@ async updateAndGetRacha(userId) {
            VALUES (?, ?, ?)`,
           [userId, today, newStreak]
         );
-        console.log(`[Racha Logic - Simplified] No existing streak entry. Inserted new streak: ${newStreak}`);
+        console.log(
+          `[Racha Logic - Simplified] No existing streak entry. Inserted new streak: ${newStreak}`
+        );
       }
 
       await connection.commit();
-      console.log(`[Racha Logic - Simplified] END: Transaction committed. Returning newStreak: ${newStreak}`);
+      console.log(
+        `[Racha Logic - Simplified] END: Transaction committed. Returning newStreak: ${newStreak}`
+      );
       return newStreak.toString();
     } catch (err) {
       if (connection) await connection.rollback();
-      console.error("[Racha Logic - Simplified] CRITICAL ERROR in updateAndGetRacha:", err);
+      console.error(
+        "[Racha Logic - Simplified] CRITICAL ERROR in updateAndGetRacha:",
+        err
+      );
       throw err;
     } finally {
       if (connection) connection.release();
@@ -268,7 +292,7 @@ async updateAndGetRacha(userId) {
       );
 
       if (rows.length > 0) {
-        console.log('Puntajes: ' + JSON.stringify(rows));
+        console.log("Puntajes: " + JSON.stringify(rows));
         return rows[0].score.toString();
       } else {
         return null;
@@ -284,84 +308,147 @@ async updateAndGetRacha(userId) {
   async writePuntaje(userId, categoriaId, newscore, level) {
     let connection;
     try {
-        connection = await this.pool.promise().getConnection();
-        
-        // Actualizar o insertar el puntaje
-        await connection.query(
-            `INSERT INTO puntaje (Usuario_id, Categoria_id, score, id, update_date, level)
+      connection = await this.pool.promise().getConnection();
+
+      // Actualizar o insertar el puntaje
+      await connection.query(
+        `INSERT INTO puntaje (Usuario_id, Categoria_id, score, id, update_date, level)
              VALUES (?, ?, ?, UUID(), current_timestamp(), ?)
              ON DUPLICATE KEY UPDATE score = score + VALUES(score)`,
-            [userId, categoriaId, newscore, level]
-        );
-        
-        console.log(`Puntaje actualizado para usuario ${userId}, categoría ${categoriaId}: +${newscore} puntos`);
-        
-        // Calcular el puntaje total del usuario
-        const [totalRows] = await connection.query(
-            `SELECT SUM(score) as total FROM puntaje WHERE Usuario_id = ?`,
-            [userId]
-        );
-        
-        const totalScore = totalRows[0].total || 0;
-        
-        // Actualizar el ranking
-        await this.writeRanking(userId, totalScore);
-        
-    } catch (err) {
-        console.error("Error al escribir puntaje:", err);
-        throw err;
-    } finally {
-        if (connection) connection.release();
-    }
-}
+        [userId, categoriaId, newscore, level]
+      );
 
-async writeRanking(userId, maxscore) {
+      console.log(
+        `Puntaje actualizado para usuario ${userId}, categoría ${categoriaId}: +${newscore} puntos`
+      );
+
+      // Calcular el puntaje total del usuario
+      const [totalRows] = await connection.query(
+        `SELECT SUM(score) as total FROM puntaje WHERE Usuario_id = ?`,
+        [userId]
+      );
+
+      const totalScore = totalRows[0].total || 0;
+
+      // Actualizar el ranking
+      await this.writeRanking(userId, totalScore);
+    } catch (err) {
+      console.error("Error al escribir puntaje:", err);
+      throw err;
+    } finally {
+      if (connection) connection.release();
+    }
+  }
+
+  async writeRanking(userId, maxscore) {
     let connection;
     try {
-        connection = await this.pool.promise().getConnection();
-        
-        // Actualizar o insertar en el ranking
-        await connection.query(
-            `INSERT INTO ranking (Usuario_id, maxscore)
+      connection = await this.pool.promise().getConnection();
+
+      // Actualizar o insertar en el ranking
+      await connection.query(
+        `INSERT INTO ranking (Usuario_id, maxscore)
              VALUES (?, ?)
              ON DUPLICATE KEY UPDATE maxscore = VALUES(maxscore)`,
-            [userId, maxscore]
-        );
-        
-        console.log(`Ranking actualizado para usuario ${userId}: maxscore ${maxscore}`);
-    } catch (err) {
-        console.error("Error al escribir ranking:", err);
-        throw err;
-    } finally {
-        if (connection) connection.release();
-    }
-}
+        [userId, maxscore]
+      );
 
-async writePerfil(username, password, email) {
+      console.log(
+        `Ranking actualizado para usuario ${userId}: maxscore ${maxscore}`
+      );
+    } catch (err) {
+      console.error("Error al escribir ranking:", err);
+      throw err;
+    } finally {
+      if (connection) connection.release();
+    }
+  }
+
+  async writePerfil(username, password, email) {
     let connection;
     try {
-        connection = await this.pool.promise().getConnection();
-        
-        // Insertar el nuevo usuario con UUID generado por MySQL
-        const [result] = await connection.query(
-            `INSERT INTO usuario (id, username, password, email, upload_date) 
+      connection = await this.pool.promise().getConnection();
+
+      // Insertar el nuevo usuario con UUID generado por MySQL
+      const [result] = await connection.query(
+        `INSERT INTO usuario (id, username, password, email, upload_date) 
              VALUES (UUID(), ?, ?, ?, current_timestamp())`,
-            [username, password, email]
-        );
-        
-        console.log(`Usuario ${username} registrado exitosamente.`);
-        return result.insertId; // Aunque en MySQL con UUID no es el ID numérico
+        [username, password, email]
+      );
+
+      console.log(`Usuario ${username} registrado exitosamente.`);
+      return result.insertId; // Aunque en MySQL con UUID no es el ID numérico
     } catch (err) {
-        // Manejar error de usuario duplicado
-        if (err.code === 'ER_DUP_ENTRY') {
-            throw new Error("El nombre de usuario ya existe");
-        }
-        console.error("Error al registrar usuario:", err);
-        throw err;
+      // Manejar error de usuario duplicado
+      if (err.code === "ER_DUP_ENTRY") {
+        throw new Error("El nombre de usuario ya existe");
+      }
+      console.error("Error al registrar usuario:", err);
+      throw err;
     } finally {
-        if (connection) connection.release();
+      if (connection) connection.release();
     }
-}
+  }
+
+  async readUserProfile(userId) {
+    let connection;
+    try {
+      connection = await this.pool.promise().getConnection();
+
+      // 1. Datos básicos del usuario
+      const [userRows] = await connection.query(
+        `SELECT username, email, upload_date FROM usuario WHERE id = ?`,
+        [userId]
+      );
+      if (userRows.length === 0) return null;
+      const userData = userRows[0];
+
+      // 2. Racha actual
+      const [streakRows] = await connection.query(
+        `SELECT numstreak FROM racha WHERE Usuario_id = ?`,
+        [userId]
+      );
+      userData.streak = streakRows.length > 0 ? streakRows[0].numstreak : 0;
+
+      // 3. Puntaje global (ranking)
+      const [rankingRows] = await connection.query(
+        `SELECT maxscore FROM ranking WHERE Usuario_id = ?`,
+        [userId]
+      );
+      userData.globalScore =
+        rankingRows.length > 0 ? rankingRows[0].maxscore : 0;
+
+      // 4. Puntajes por categoría
+      const [categoryScores] = await connection.query(
+        `SELECT c.name AS category_name, p.score 
+             FROM puntaje p
+             JOIN categoria c ON p.Categoria_id = c.id
+             WHERE p.Usuario_id = ?
+             ORDER BY p.score DESC`,
+        [userId]
+      );
+      userData.categoryScores = categoryScores;
+
+      // 5. Posición en el ranking global
+      const [rankingPosition] = await connection.query(
+        `SELECT position FROM (
+                SELECT Usuario_id, ROW_NUMBER() OVER (ORDER BY maxscore DESC) AS position 
+                FROM ranking
+            ) AS ranked 
+            WHERE Usuario_id = ?`,
+        [userId]
+      );
+      userData.rankingPosition =
+        rankingPosition.length > 0 ? rankingPosition[0].position : "N/A";
+
+      return userData;
+    } catch (err) {
+      console.error("Error al leer perfil de usuario:", err);
+      throw err;
+    } finally {
+      if (connection) connection.release();
+    }
+  }
 }
 
 module.exports = MySQLHandler;
