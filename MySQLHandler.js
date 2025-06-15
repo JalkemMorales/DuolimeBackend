@@ -335,6 +335,32 @@ async writeRanking(userId, maxscore) {
         if (connection) connection.release();
     }
 }
+
+async writePerfil(username, password, email) {
+    let connection;
+    try {
+        connection = await this.pool.promise().getConnection();
+        
+        // Insertar el nuevo usuario con UUID generado por MySQL
+        const [result] = await connection.query(
+            `INSERT INTO usuario (id, username, password, email, upload_date) 
+             VALUES (UUID(), ?, ?, ?, current_timestamp())`,
+            [username, password, email]
+        );
+        
+        console.log(`Usuario ${username} registrado exitosamente.`);
+        return result.insertId; // Aunque en MySQL con UUID no es el ID numérico
+    } catch (err) {
+        // Manejar error de usuario duplicado
+        if (err.code === 'ER_DUP_ENTRY') {
+            throw new Error("El nombre de usuario ya existe");
+        }
+        console.error("Error al registrar usuario:", err);
+        throw err;
+    } finally {
+        if (connection) connection.release();
+    }
+}
 }
 
 module.exports = MySQLHandler;

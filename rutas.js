@@ -161,13 +161,13 @@ router.post('/registerPuntaje', async (req, res) => {
 });
 
 router.post('/registerProfile', async (req, res) => {
-    const { username, password } = req.body;
+    const { username, password, email } = req.body;
 
     try {
         // Log para mostrar el nombre de usuario y la contraseña recibidos
         console.log(`Nombre recibido: ${username}, Contraseña recibida: ${password}`);
 
-        await files.writePerfil(username, password);
+        await mysql.writePerfil(username, password, email);
         
         res.status(200).send({ message: 'Usuario registrado exitosamente' });
     } catch (error) {
