@@ -121,6 +121,7 @@ class MySQLHandler {
       const [rows] = await connection.query(
         `SELECT
             u.username,
+            u.id,
             r.numstreak AS streak_count
          FROM
             racha r
@@ -347,6 +348,7 @@ class MySQLHandler {
       const [rows] = await connection.query(
         `SELECT
                 u.username,
+                u.id,
                 SUM(p.score) AS score_total_por_categoria
              FROM
                 puntaje p
@@ -355,7 +357,7 @@ class MySQLHandler {
              WHERE
                 p.Categoria_id = ?
              GROUP BY
-                u.username
+                u.username, u.id
              ORDER BY
                 score_total_por_categoria DESC`,
         [categoriaId]
@@ -479,6 +481,35 @@ class MySQLHandler {
       if (connection) connection.release();
     }
   }
+
+  async readAllProgressByUserId(userId) {
+  let connection;
+  try {
+    connection = await this.pool.promise().getConnection();
+    const [rows] = await connection.query(`
+      SELECT 
+        c.id AS category_id,
+        c.name AS category_name,
+        COALESCE(p.max_level, 1) AS level
+      FROM categoria c
+      LEFT JOIN (
+        SELECT 
+          Categoria_id, 
+          MAX(level) AS max_level
+        FROM progreso
+        WHERE Usuario_id = ?
+        GROUP BY Categoria_id
+      ) p ON c.id = p.Categoria_id
+    `, [userId]);
+
+    return rows; // Devuelve [{ category_id, level }, ...]
+  } catch (err) {
+    console.error("Error al leer progreso por usuario:", err);
+    throw err;
+  } finally {
+    if (connection) connection.release();
+  }
+}
 }
 
 module.exports = MySQLHandler;

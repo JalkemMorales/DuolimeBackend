@@ -226,4 +226,19 @@ router.post('/getUserProfile', async (req, res) => {
     }
 });
 
+router.post('/readAllProgressByUserId', async (req, res) => {
+    const { id } = req.body;
+    try {
+        const progress = await mysql.readAllProgressByUserId(id);
+        if (progress) {
+            res.status(200).json(progress);
+        } else {
+            res.status(404).json({ message: 'Perfil no encontrado' });
+        }
+    } catch (error) {
+        console.error('Error al obtener datos del perfil:', error);
+        res.status(500).json({ message: 'Error en el servidor.' });
+    }
+});
+
 module.exports = router;
