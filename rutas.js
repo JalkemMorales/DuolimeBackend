@@ -149,15 +149,22 @@ router.post('/registerProgress', async (req, res) => {
 });
 
 router.post('/registerPuntaje', async (req, res) => {
-  const { id, category, newscore, level } = req.body;
+    const { id, category, newscore, level } = req.body;
+    console.log(`[Backend API - /registerPuntaje] Recibido: userId=${id}, categoryId=${category}, newscore=${newscore}, level=${level}`);
+    console.log(`[Backend API - /registerPuntaje] Tipo de 'newscore' al llegar: ${typeof newscore}`);
+    const parsedNewScore = parseInt(newscore, 10);
 
-  try {
-      console.log(`Id recibido: ${id}, Categoria recibida: ${category}`);
-      await mysql.writePuntaje(id, category, newscore, level);
-      res.status(200).send({ message: 'Puntaje registrado exitosamente' });
-  } catch (error) {
-      res.status(500).send({ message: 'Error al registrar puntaje', error });
-  }
+    if (isNaN(parsedNewScore)) {
+        console.error(`[Backend API - /registerPuntaje] ERROR: 'newscore' recibido no es un número válido: ${newscore}`);
+        return res.status(400).send({ message: 'El puntaje enviado no es un número válido. Por favor, verifica el valor.' });
+    }
+    try {
+        await mysql.writePuntaje(id, category, parsedNewScore, level);
+        res.status(200).send({ message: 'Puntaje registrado exitosamente.' });
+    } catch (error) {
+        console.error('Error en /registerPuntaje (al registrar puntaje):', error);
+        res.status(500).send({ message: 'Error al registrar puntaje en el servidor.', error: error.message || error });
+    }
 });
 
 router.post('/registerProfile', async (req, res) => {
