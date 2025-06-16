@@ -340,6 +340,36 @@ class MySQLHandler {
     }
   }
 
+   async readAllScoresByCategoryId(categoriaId) {
+    let connection;
+    try {
+      connection = await this.pool.promise().getConnection();
+      const [rows] = await connection.query(
+        `SELECT
+                u.username,
+                SUM(p.score) AS score_total_por_categoria
+             FROM
+                puntaje p
+             JOIN
+                usuario u ON p.Usuario_id = u.id
+             WHERE
+                p.Categoria_id = ?
+             GROUP BY
+                u.username
+             ORDER BY
+                score_total_por_categoria DESC`,
+        [categoriaId]
+      );
+      // Aseguramos que siempre retorne un array, incluso si está vacío.
+      return rows || [];
+    } catch (err) {
+      console.error(`Error al leer puntajes sumados por Categoría ${categoriaId}:`, err);
+      throw err;
+    } finally {
+      if (connection) connection.release();
+    }
+  }
+
   async writeRanking(userId, maxscore) {
     let connection;
     try {
