@@ -341,7 +341,7 @@ class MySQLHandler {
     }
   }
 
-   async readAllScoresByCategoryId(categoriaId) {
+  async readAllScoresByCategoryId(categoriaId) {
     let connection;
     try {
       connection = await this.pool.promise().getConnection();
@@ -365,7 +365,10 @@ class MySQLHandler {
       // Aseguramos que siempre retorne un array, incluso si está vacío.
       return rows || [];
     } catch (err) {
-      console.error(`Error al leer puntajes sumados por Categoría ${categoriaId}:`, err);
+      console.error(
+        `Error al leer puntajes sumados por Categoría ${categoriaId}:`,
+        err
+      );
       throw err;
     } finally {
       if (connection) connection.release();
@@ -452,14 +455,18 @@ class MySQLHandler {
 
       // 4. Puntajes por categoría
       const [categoryScores] = await connection.query(
-        `SELECT c.name AS category_name, p.score 
-             FROM puntaje p
-             JOIN categoria c ON p.Categoria_id = c.id
-             WHERE p.Usuario_id = ?
-             ORDER BY p.score DESC`,
+        `SELECT 
+      c.name AS category_name, 
+      SUM(p.score) AS score 
+   FROM puntaje p
+   JOIN categoria c ON p.Categoria_id = c.id
+   WHERE p.Usuario_id = ?
+   GROUP BY c.id, c.name
+   ORDER BY score DESC`,
         [userId]
       );
       userData.categoryScores = categoryScores;
+      console.log("CATEGORIES: " + JSON.stringify(categoryScores));
 
       // 5. Posición en el ranking global
       const [rankingPosition] = await connection.query(
@@ -483,10 +490,11 @@ class MySQLHandler {
   }
 
   async readAllProgressByUserId(userId) {
-  let connection;
-  try {
-    connection = await this.pool.promise().getConnection();
-    const [rows] = await connection.query(`
+    let connection;
+    try {
+      connection = await this.pool.promise().getConnection();
+      const [rows] = await connection.query(
+        `
       SELECT 
         c.id AS category_id,
         c.name AS category_name,
@@ -500,16 +508,17 @@ class MySQLHandler {
         WHERE Usuario_id = ?
         GROUP BY Categoria_id
       ) p ON c.id = p.Categoria_id
-    `, [userId]);
-
-    return rows; // Devuelve [{ category_id, level }, ...]
-  } catch (err) {
-    console.error("Error al leer progreso por usuario:", err);
-    throw err;
-  } finally {
-    if (connection) connection.release();
+    `,
+        [userId]
+      );
+      return rows; // Devuelve [{ category_id, level }, ...]
+    } catch (err) {
+      console.error("Error al leer progreso por usuario:", err);
+      throw err;
+    } finally {
+      if (connection) connection.release();
+    }
   }
-}
 }
 
 module.exports = MySQLHandler;
