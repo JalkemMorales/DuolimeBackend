@@ -311,11 +311,14 @@ class MySQLHandler {
     try {
       connection = await this.pool.promise().getConnection();
 
-      // Actualizar o insertar el puntaje
+      // Iniciar transacción para asegurar consistencia
+      await connection.beginTransaction();
+
+      // 1. Insertar o actualizar el puntaje en la categoría
       await connection.query(
         `INSERT INTO puntaje (Usuario_id, Categoria_id, score, id, update_date, level)
-             VALUES (?, ?, ?, UUID(), current_timestamp(), ?)
-             ON DUPLICATE KEY UPDATE score = score + VALUES(score)`,
+       VALUES (?, ?, ?, UUID(), current_timestamp(), ?)
+       ON DUPLICATE KEY UPDATE score = score + VALUES(score)`,
         [userId, categoriaId, newscore, level]
       );
 
@@ -323,7 +326,7 @@ class MySQLHandler {
         `Puntaje actualizado para usuario ${userId}, categoría ${categoriaId}: +${newscore} puntos`
       );
 
-      // Calcular el puntaje total del usuario
+      // 2. Calcular el TOTAL de puntuaciones del usuario
       const [totalRows] = await connection.query(
         `SELECT SUM(score) as total FROM puntaje WHERE Usuario_id = ?`,
         [userId]
@@ -331,9 +334,38 @@ class MySQLHandler {
 
       const totalScore = totalRows[0].total || 0;
 
-      // Actualizar el ranking
-      await this.writeRanking(userId, totalScore);
+      // 3. Actualizar el ranking SIN usar ON DUPLICATE KEY
+      // Verificar si existe registro y bloquear fila
+      const [existingRanking] = await connection.query(
+        `SELECT Usuario_id FROM ranking WHERE Usuario_id = ? FOR UPDATE`,
+        [userId]
+      );
+
+      if (existingRanking.length > 0) {
+        // Actualizar si existe
+        await connection.query(
+          `UPDATE ranking SET maxscore = ? WHERE Usuario_id = ?`,
+          [totalScore, userId]
+        );
+        console.log(
+          `Ranking actualizado (UPDATE) para usuario ${userId}: nuevo total ${totalScore}`
+        );
+      } else {
+        // Insertar si no existe
+        await connection.query(
+          `INSERT INTO ranking (Usuario_id, maxscore) VALUES (?, ?)`,
+          [userId, totalScore]
+        );
+        console.log(
+          `Ranking actualizado (INSERT) para usuario ${userId}: nuevo total ${totalScore}`
+        );
+      }
+
+      // Confirmar transacción
+      await connection.commit();
     } catch (err) {
+      // Revertir en caso de error
+      if (connection) await connection.rollback();
       console.error("Error al escribir puntaje:", err);
       throw err;
     } finally {
